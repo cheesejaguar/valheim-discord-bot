@@ -26,7 +26,7 @@ class ValheimBot(discord.Client):
         logging.info(f"Connected as {self.user} – monitoring {ADDRESS}")
         self.update_status.start()
 
-    @tasks.loop(seconds=UPDATE_PERIOD)
+    @tasks.loop(seconds=UPDATE_PERIOD)  # type: ignore[misc]
     async def update_status(self) -> None:
         try:
             info = await asyncio.to_thread(a2s.info, ADDRESS, timeout=3)
@@ -40,7 +40,7 @@ class ValheimBot(discord.Client):
         if self.message is not None:
             await self.message.edit(embed=embed)
 
-    @update_status.before_loop
+    @update_status.before_loop  # type: ignore[misc]
     async def before_update(self) -> None:
         await self.wait_until_ready()
 
