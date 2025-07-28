@@ -20,14 +20,14 @@ ADDRESS = (HOST, PORT)
 
 # -------- Discord client --------
 class ValheimBot(discord.Client):
-    async def on_ready(self):
+    async def on_ready(self) -> None:
         self.channel = await self.fetch_channel(CHANNEL_ID)
         self.message = await self.channel.fetch_message(MESSAGE_ID)
         logging.info(f"Connected as {self.user} – monitoring {ADDRESS}")
         self.update_status.start()
 
     @tasks.loop(seconds=UPDATE_PERIOD)
-    async def update_status(self):
+    async def update_status(self) -> None:
         try:
             info = await asyncio.to_thread(a2s.info, ADDRESS, timeout=3)
             status_line = (
@@ -41,7 +41,7 @@ class ValheimBot(discord.Client):
             await self.message.edit(embed=embed)
 
     @update_status.before_loop
-    async def before_update(self):
+    async def before_update(self) -> None:
         await self.wait_until_ready()
 
 
