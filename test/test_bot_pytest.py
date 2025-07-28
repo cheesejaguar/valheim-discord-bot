@@ -45,7 +45,7 @@ def bot_instance(mock_env):
     bot = ValheimBot(intents=intents)
     yield bot
     # Cleanup
-    if hasattr(bot, 'update_status'):
+    if hasattr(bot, "update_status"):
         bot.update_status.cancel()
 
 
@@ -60,14 +60,16 @@ class TestValheimBot:
     @pytest.mark.asyncio
     async def test_on_ready(self, bot_instance):
         """Test the on_ready method sets up the bot correctly."""
-        with patch.object(bot_instance, 'fetch_channel') as mock_fetch_channel, \
-             patch('logging.info') as mock_logging:
-            
+        with (
+            patch.object(bot_instance, "fetch_channel") as mock_fetch_channel,
+            patch("logging.info") as mock_logging,
+        ):
+
             # Mock the channel and message
             mock_channel = AsyncMock()
             mock_message = AsyncMock()
             mock_fetch_channel.return_value = mock_channel
-            
+
             # Mock fetch_message on the channel
             mock_channel.fetch_message = AsyncMock(return_value=mock_message)
 
@@ -81,23 +83,25 @@ class TestValheimBot:
             # Verify channel and message were fetched
             mock_fetch_channel.assert_called_once_with(0)  # Default value
             mock_channel.fetch_message.assert_called_once_with(0)  # Default value
-            
+
             # Verify attributes were set
             assert bot_instance.channel == mock_channel
             assert bot_instance.message == mock_message
-            
+
             # Verify logging was called
             mock_logging.assert_called_once()
-            
+
             # Verify update_status task was started
             bot_instance.update_status.start.assert_called_once()
 
     @pytest.mark.asyncio
     async def test_update_status_online(self, bot_instance):
         """Test update_status when server is online."""
-        with patch('asyncio.to_thread') as mock_to_thread, \
-             patch('discord.Embed') as mock_embed:
-            
+        with (
+            patch("asyncio.to_thread") as mock_to_thread,
+            patch("discord.Embed") as mock_embed,
+        ):
+
             # Mock server info
             mock_info = Mock()
             mock_info.player_count = 5
@@ -116,25 +120,31 @@ class TestValheimBot:
 
             # Verify a2s.info was called with the correct address
             import sys
-            sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+
+            sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
             import bot
-            expected_address = ('test.host.com', 2457)
-            mock_to_thread.assert_called_once_with(a2s.info, expected_address, timeout=3)
-            
+
+            expected_address = ("test.host.com", 2457)
+            mock_to_thread.assert_called_once_with(
+                a2s.info, expected_address, timeout=3
+            )
+
             # Verify embed was created with correct description
             mock_embed.assert_called_once()
             call_args = mock_embed.call_args[1]
-            assert '🟢 **Online** – 5/10 players' in call_args['description']
-            
+            assert "🟢 **Online** – 5/10 players" in call_args["description"]
+
             # Verify message was edited
             bot_instance.message.edit.assert_called_once_with(embed=mock_embed_instance)
 
     @pytest.mark.asyncio
     async def test_update_status_offline(self, bot_instance):
         """Test update_status when server is offline."""
-        with patch('asyncio.to_thread') as mock_to_thread, \
-             patch('discord.Embed') as mock_embed:
-            
+        with (
+            patch("asyncio.to_thread") as mock_to_thread,
+            patch("discord.Embed") as mock_embed,
+        ):
+
             # Mock exception when server is unreachable
             mock_to_thread.side_effect = Exception("Connection failed")
 
@@ -150,23 +160,27 @@ class TestValheimBot:
 
             # Verify a2s.info was called with the correct address
             import sys
-            sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+
+            sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
             import bot
-            expected_address = ('test.host.com', 2457)
-            mock_to_thread.assert_called_once_with(a2s.info, expected_address, timeout=3)
-            
+
+            expected_address = ("test.host.com", 2457)
+            mock_to_thread.assert_called_once_with(
+                a2s.info, expected_address, timeout=3
+            )
+
             # Verify embed was created with offline status
             mock_embed.assert_called_once()
             call_args = mock_embed.call_args[1]
-            assert '🔴 **Offline / unreachable**' in call_args['description']
-            
+            assert "🔴 **Offline / unreachable**" in call_args["description"]
+
             # Verify message was edited
             bot_instance.message.edit.assert_called_once_with(embed=mock_embed_instance)
 
     @pytest.mark.asyncio
     async def test_before_update(self, bot_instance):
         """Test the before_update method."""
-        with patch.object(bot_instance, 'wait_until_ready') as mock_wait_until_ready:
+        with patch.object(bot_instance, "wait_until_ready") as mock_wait_until_ready:
             # Mock wait_until_ready
             mock_wait_until_ready.return_value = AsyncMock()
 
@@ -181,17 +195,19 @@ class TestValheimBot:
         # Re-import bot module to get fresh environment variables
         import importlib
         import sys
-        sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+
+        sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
         import bot
+
         importlib.reload(bot)
-        
-        assert bot.TOKEN == 'test_token'
+
+        assert bot.TOKEN == "test_token"
         assert bot.CHANNEL_ID == 123456789
         assert bot.MESSAGE_ID == 987654321
-        assert bot.HOST == 'test.host.com'
+        assert bot.HOST == "test.host.com"
         assert bot.PORT == 2457
         assert bot.UPDATE_PERIOD == 60
-        assert bot.ADDRESS == ('test.host.com', 2457)
+        assert bot.ADDRESS == ("test.host.com", 2457)
 
     @pytest.mark.parametrize(
         "player_count,max_players,expected_status",
@@ -203,11 +219,15 @@ class TestValheimBot:
         ],
     )
     @pytest.mark.asyncio
-    async def test_update_status_player_counts(self, bot_instance, player_count, max_players, expected_status):
+    async def test_update_status_player_counts(
+        self, bot_instance, player_count, max_players, expected_status
+    ):
         """Test update_status with various player count scenarios."""
-        with patch('asyncio.to_thread') as mock_to_thread, \
-             patch('discord.Embed') as mock_embed:
-            
+        with (
+            patch("asyncio.to_thread") as mock_to_thread,
+            patch("discord.Embed") as mock_embed,
+        ):
+
             # Mock server info
             mock_info = Mock()
             mock_info.player_count = player_count
@@ -226,15 +246,19 @@ class TestValheimBot:
 
             # Verify a2s.info was called with the correct address
             import sys
-            sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+
+            sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
             import bot
-            expected_address = ('test.host.com', 2457)
-            mock_to_thread.assert_called_once_with(a2s.info, expected_address, timeout=3)
+
+            expected_address = ("test.host.com", 2457)
+            mock_to_thread.assert_called_once_with(
+                a2s.info, expected_address, timeout=3
+            )
 
             # Verify embed was created with correct status
             mock_embed.assert_called_once()
             call_args = mock_embed.call_args[1]
-            assert expected_status in call_args['description']
+            assert expected_status in call_args["description"]
 
     @pytest.mark.parametrize(
         "exception",
@@ -248,9 +272,11 @@ class TestValheimBot:
     @pytest.mark.asyncio
     async def test_update_status_exception_handling(self, bot_instance, exception):
         """Test update_status handles various exceptions correctly."""
-        with patch('asyncio.to_thread') as mock_to_thread, \
-             patch('discord.Embed') as mock_embed:
-            
+        with (
+            patch("asyncio.to_thread") as mock_to_thread,
+            patch("discord.Embed") as mock_embed,
+        ):
+
             # Mock exception
             mock_to_thread.side_effect = exception
 
@@ -266,15 +292,19 @@ class TestValheimBot:
 
             # Verify a2s.info was called with the correct address
             import sys
-            sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+
+            sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
             import bot
-            expected_address = ('test.host.com', 2457)
-            mock_to_thread.assert_called_once_with(a2s.info, expected_address, timeout=3)
+
+            expected_address = ("test.host.com", 2457)
+            mock_to_thread.assert_called_once_with(
+                a2s.info, expected_address, timeout=3
+            )
 
             # Verify embed was created with offline status
             mock_embed.assert_called_once()
             call_args = mock_embed.call_args[1]
-            assert '🔴 **Offline / unreachable**' in call_args['description']
+            assert "🔴 **Offline / unreachable**" in call_args["description"]
 
     def test_address_tuple(self):
         """Test that ADDRESS is correctly formatted as a tuple."""
@@ -297,25 +327,27 @@ class TestValheimBot:
         """Test that intents are configured correctly."""
         assert bot_instance.intents.value == 0
 
-    @patch('discord.Client.run')
+    @patch("discord.Client.run")
     def test_main_execution(self, mock_run, mock_env):
         """Test the main execution block."""
         # Mock the __name__ attribute
         import sys
-        original_name = sys.modules['bot'].__name__
-        sys.modules['bot'].__name__ = '__main__'
-        
+
+        original_name = sys.modules["bot"].__name__
+        sys.modules["bot"].__name__ = "__main__"
+
         try:
             # Mock the client.run method
-            with patch.object(sys.modules['bot'].client, 'run', mock_run):
+            with patch.object(sys.modules["bot"].client, "run", mock_run):
                 # Import the module to trigger the main execution
                 import importlib
                 import bot
+
                 importlib.reload(bot)
                 mock_run.assert_called_once_with(bot.TOKEN)
         finally:
             # Restore original name
-            sys.modules['bot'].__name__ = original_name
+            sys.modules["bot"].__name__ = original_name
 
 
 class TestValheimBotIntegration:
@@ -323,17 +355,21 @@ class TestValheimBotIntegration:
 
     def test_bot_creation_with_defaults(self):
         """Test bot creation with default environment variables."""
-        with patch.dict(os.environ, {
-            'DISCORD_TOKEN': 'test_token',
-            'DISCORD_CHANNEL_ID': '123456789',
-            'DISCORD_MESSAGE_ID': '987654321',
-            'VALHEIM_HOST': 'test.host.com'
-        }):
+        with patch.dict(
+            os.environ,
+            {
+                "DISCORD_TOKEN": "test_token",
+                "DISCORD_CHANNEL_ID": "123456789",
+                "DISCORD_MESSAGE_ID": "987654321",
+                "VALHEIM_HOST": "test.host.com",
+            },
+        ):
             # Re-import to get fresh environment variables
             import importlib
             import bot
+
             importlib.reload(bot)
-            
+
             # Verify the bot was created
             assert isinstance(bot.client, bot.ValheimBot)
 
@@ -349,7 +385,7 @@ class TestValheimBotIntegration:
     def test_required_environment_variables(self, required_var):
         """Test that required environment variables are properly handled."""
         # Test that the variable is accessed (will raise KeyError if missing)
-        with patch.dict(os.environ, {required_var: 'test_value'}):
+        with patch.dict(os.environ, {required_var: "test_value"}):
             # This should not raise an exception
             pass
 
@@ -363,14 +399,16 @@ class TestValheimBotEdgeCases:
         intents = discord.Intents.none()
         bot = ValheimBot(intents=intents)
         bot.message = None
-        
+
         # Should not raise an exception
-        with patch('asyncio.to_thread') as mock_to_thread, \
-             patch('discord.Embed') as mock_embed:
-            
+        with (
+            patch("asyncio.to_thread") as mock_to_thread,
+            patch("discord.Embed") as mock_embed,
+        ):
+
             mock_to_thread.side_effect = Exception("Test exception")
             mock_embed.return_value = Mock()
-            
+
             # This should handle the None message gracefully
             await bot.update_status()
 
@@ -379,8 +417,9 @@ class TestValheimBotEdgeCases:
         # Re-import bot module to get fresh environment variables
         import importlib
         import bot
+
         importlib.reload(bot)
-        
+
         assert isinstance(bot.CHANNEL_ID, int)
         assert isinstance(bot.MESSAGE_ID, int)
         assert isinstance(bot.PORT, int)
@@ -394,11 +433,11 @@ class TestValheimBotEdgeCases:
         # Mock the task
         bot_instance.update_status = Mock()
         bot_instance.update_status.cancel = Mock()
-        
+
         # Test cancellation
         bot_instance.update_status.cancel()
         bot_instance.update_status.cancel.assert_called_once()
 
 
-if __name__ == '__main__':
-    pytest.main([__file__, '-v']) 
+if __name__ == "__main__":
+    pytest.main([__file__, "-v"])

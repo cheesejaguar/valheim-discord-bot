@@ -16,6 +16,7 @@ UPDATE_PERIOD = int(os.getenv("UPDATE_PERIOD", "60"))
 
 ADDRESS = (HOST, PORT)
 
+
 # -------- Discord client --------
 class ValheimBot(discord.Client):
     async def on_ready(self):
@@ -28,7 +29,9 @@ class ValheimBot(discord.Client):
     async def update_status(self):
         try:
             info = await asyncio.to_thread(a2s.info, ADDRESS, timeout=3)
-            status_line = f"🟢 **Online** – {info.player_count}/{info.max_players} players"
+            status_line = (
+                f"🟢 **Online** – {info.player_count}/{info.max_players} players"
+            )
         except Exception:
             status_line = "🔴 **Offline / unreachable**"
 
@@ -39,6 +42,7 @@ class ValheimBot(discord.Client):
     @update_status.before_loop
     async def before_update(self):
         await self.wait_until_ready()
+
 
 intents = discord.Intents.none()  # no privileged intents needed
 client = ValheimBot(intents=intents)
