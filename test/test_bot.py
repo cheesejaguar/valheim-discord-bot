@@ -1,14 +1,24 @@
-import unittest
 import asyncio
 import os
 import sys
-from unittest.mock import Mock, patch, AsyncMock, MagicMock
-import discord
+import unittest
+from unittest.mock import AsyncMock, MagicMock, Mock, patch
+
 import a2s
+import discord
 
 # Add src directory to path for imports
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
-from bot import ValheimBot, ADDRESS, TOKEN, CHANNEL_ID, MESSAGE_ID, HOST, PORT, UPDATE_PERIOD
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
+from bot import (
+    ADDRESS,
+    CHANNEL_ID,
+    HOST,
+    MESSAGE_ID,
+    PORT,
+    TOKEN,
+    UPDATE_PERIOD,
+    ValheimBot,
+)
 
 
 class TestValheimBot(unittest.TestCase):
@@ -20,14 +30,17 @@ class TestValheimBot(unittest.TestCase):
         self.bot = ValheimBot(intents=self.intents)
         
         # Mock environment variables
-        self.env_patcher = patch.dict(os.environ, {
-            'DISCORD_TOKEN': 'test_token',
-            'DISCORD_CHANNEL_ID': '123456789',
-            'DISCORD_MESSAGE_ID': '987654321',
-            'VALHEIM_HOST': 'test.host.com',
-            'VALHEIM_QUERY_PORT': '2457',
-            'UPDATE_PERIOD': '60'
-        })
+        self.env_patcher = patch.dict(
+            os.environ,
+            {
+                "DISCORD_TOKEN": "test_token",
+                "DISCORD_CHANNEL_ID": "123456789",
+                "DISCORD_MESSAGE_ID": "987654321",
+                "VALHEIM_HOST": "test.host.com",
+                "VALHEIM_QUERY_PORT": "2457",
+                "UPDATE_PERIOD": "60",
+            },
+        )
         self.env_patcher.start()
 
     def tearDown(self):

@@ -1,27 +1,40 @@
-import pytest
 import asyncio
 import os
 import sys
-from unittest.mock import Mock, patch, AsyncMock
-import discord
+
 import a2s
+import discord
+import pytest
+from unittest.mock import AsyncMock, Mock, patch
 
 # Add src directory to path for imports
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
-from bot import ValheimBot, ADDRESS, TOKEN, CHANNEL_ID, MESSAGE_ID, HOST, PORT, UPDATE_PERIOD
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
+from bot import (
+    ADDRESS,
+    CHANNEL_ID,
+    HOST,
+    MESSAGE_ID,
+    PORT,
+    TOKEN,
+    UPDATE_PERIOD,
+    ValheimBot,
+)
 
 
 @pytest.fixture
 def mock_env():
     """Fixture to mock environment variables."""
-    with patch.dict(os.environ, {
-        'DISCORD_TOKEN': 'test_token',
-        'DISCORD_CHANNEL_ID': '123456789',
-        'DISCORD_MESSAGE_ID': '987654321',
-        'VALHEIM_HOST': 'test.host.com',
-        'VALHEIM_QUERY_PORT': '2457',
-        'UPDATE_PERIOD': '60'
-    }):
+    with patch.dict(
+        os.environ,
+        {
+            "DISCORD_TOKEN": "test_token",
+            "DISCORD_CHANNEL_ID": "123456789",
+            "DISCORD_MESSAGE_ID": "987654321",
+            "VALHEIM_HOST": "test.host.com",
+            "VALHEIM_QUERY_PORT": "2457",
+            "UPDATE_PERIOD": "60",
+        },
+    ):
         yield
 
 
@@ -180,12 +193,15 @@ class TestValheimBot:
         assert bot.UPDATE_PERIOD == 60
         assert bot.ADDRESS == ('test.host.com', 2457)
 
-    @pytest.mark.parametrize("player_count,max_players,expected_status", [
-        (0, 10, "🟢 **Online** – 0/10 players"),
-        (1, 1, "🟢 **Online** – 1/1 players"),
-        (10, 10, "🟢 **Online** – 10/10 players"),
-        (5, 20, "🟢 **Online** – 5/20 players"),
-    ])
+    @pytest.mark.parametrize(
+        "player_count,max_players,expected_status",
+        [
+            (0, 10, "🟢 **Online** – 0/10 players"),
+            (1, 1, "🟢 **Online** – 1/1 players"),
+            (10, 10, "🟢 **Online** – 10/10 players"),
+            (5, 20, "🟢 **Online** – 5/20 players"),
+        ],
+    )
     @pytest.mark.asyncio
     async def test_update_status_player_counts(self, bot_instance, player_count, max_players, expected_status):
         """Test update_status with various player count scenarios."""
@@ -220,12 +236,15 @@ class TestValheimBot:
             call_args = mock_embed.call_args[1]
             assert expected_status in call_args['description']
 
-    @pytest.mark.parametrize("exception", [
-        ConnectionError("Connection refused"),
-        TimeoutError("Request timed out"),
-        OSError("Network unreachable"),
-        Exception("Unknown error")
-    ])
+    @pytest.mark.parametrize(
+        "exception",
+        [
+            ConnectionError("Connection refused"),
+            TimeoutError("Request timed out"),
+            OSError("Network unreachable"),
+            Exception("Unknown error"),
+        ],
+    )
     @pytest.mark.asyncio
     async def test_update_status_exception_handling(self, bot_instance, exception):
         """Test update_status handles various exceptions correctly."""
@@ -318,12 +337,15 @@ class TestValheimBotIntegration:
             # Verify the bot was created
             assert isinstance(bot.client, bot.ValheimBot)
 
-    @pytest.mark.parametrize("required_var", [
-        'DISCORD_TOKEN',
-        'DISCORD_CHANNEL_ID', 
-        'DISCORD_MESSAGE_ID', 
-        'VALHEIM_HOST'
-    ])
+    @pytest.mark.parametrize(
+        "required_var",
+        [
+            "DISCORD_TOKEN",
+            "DISCORD_CHANNEL_ID",
+            "DISCORD_MESSAGE_ID",
+            "VALHEIM_HOST",
+        ],
+    )
     def test_required_environment_variables(self, required_var):
         """Test that required environment variables are properly handled."""
         # Test that the variable is accessed (will raise KeyError if missing)

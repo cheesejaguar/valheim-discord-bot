@@ -4,9 +4,9 @@ Test runner script for the Valheim Discord Bot.
 This script provides an easy way to run all tests with coverage reporting.
 """
 
-import sys
-import subprocess
 import os
+import subprocess
+import sys
 
 
 def run_tests():

@@ -4,9 +4,9 @@ Development script for running all checks locally.
 This is a Python alternative to the bash script.
 """
 
+import os
 import subprocess
 import sys
-import os
 from pathlib import Path
 
 
