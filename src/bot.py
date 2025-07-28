@@ -5,9 +5,9 @@ from discord.ext import tasks
 logging.basicConfig(level=logging.INFO)
 
 TOKEN          = os.getenv("DISCORD_TOKEN")
-CHANNEL_ID     = int(os.getenv("DISCORD_CHANNEL_ID"))
-MESSAGE_ID     = int(os.getenv("DISCORD_MESSAGE_ID"))
-HOST           = os.getenv("VALHEIM_HOST")
+CHANNEL_ID     = int(os.getenv("DISCORD_CHANNEL_ID", "0"))
+MESSAGE_ID     = int(os.getenv("DISCORD_MESSAGE_ID", "0"))
+HOST           = os.getenv("VALHEIM_HOST", "localhost")
 PORT           = int(os.getenv("VALHEIM_QUERY_PORT", "2457"))
 UPDATE_PERIOD  = int(os.getenv("UPDATE_PERIOD", "60"))
 
@@ -30,7 +30,8 @@ class ValheimBot(discord.Client):
             status_line = "🔴 **Offline / unreachable**"
 
         embed = discord.Embed(description=status_line)
-        await self.message.edit(embed=embed)
+        if self.message is not None:
+            await self.message.edit(embed=embed)
 
     @update_status.before_loop
     async def before_update(self):

@@ -21,11 +21,18 @@ It uses the Steam A2S protocol to poll your server, then updates a single mess
 
 ```text
 valheim-discord-bot/
-├─ bot.py               # main application (async Discord client)
-├─ requirements.txt     # pinned dependencies
-├─ Dockerfile           # multi‑stage, distroless build
-├─ .dockerignore        # ignore cache, VCS, secrets
-└─ README.md            # you are here
+├─ src/
+│  └─ bot.py                # main application (async Discord client)
+├─ test/
+│  ├─ test_bot.py           # unittest-based tests
+│  ├─ test_bot_pytest.py    # pytest-based tests (recommended)
+│  └─ run_tests.py          # test runner script
+├─ requirements.txt          # pinned dependencies
+├─ requirements-test.txt     # test dependencies
+├─ pytest.ini              # pytest configuration
+├─ Dockerfile               # multi‑stage, distroless build
+├─ .dockerignore            # ignore cache, VCS, secrets
+└─ README.md                # you are here
 ```
 
 > **Secrets** (`.env`) are **NOT** committed—add the file locally or inject vars in your CI / orchestration platform.
@@ -121,6 +128,76 @@ python bot.py
 ```
 
 Logs stream to stdout; use `CTRL‑C` to stop.
+
+### 🧪 Testing
+
+The project includes comprehensive unit tests with 100% code coverage:
+
+```bash
+# Install test dependencies
+pip install -r requirements-test.txt
+
+# Run all tests with coverage
+python test/run_tests.py
+
+# Or run with pytest directly
+pytest --cov=src.bot --cov-report=html
+
+# Run simple tests without pytest
+python test/run_tests.py --simple
+```
+
+**Test Coverage:**
+- ✅ Bot initialization and configuration
+- ✅ Environment variable handling
+- ✅ Server status polling (online/offline scenarios)
+- ✅ Discord message editing
+- ✅ Exception handling and error recovery
+- ✅ Async task management
+- ✅ Edge cases and error conditions
+
+The tests use mocking to avoid external dependencies and ensure reliable, fast execution.
+
+### 🚀 Continuous Integration
+
+The project includes GitHub Actions workflows for automated testing:
+
+- **`.github/workflows/test.yml`** - Basic test workflow (recommended for most users)
+- **`.github/workflows/ci.yml`** - Comprehensive CI with linting, security checks, and Docker testing
+- **`.github/workflows/tests.yml`** - Simple test workflow
+
+**Features:**
+- ✅ Multi-Python version testing (3.9, 3.10, 3.11, 3.12)
+- ✅ Code coverage reporting
+- ✅ Linting with flake8, black, isort, mypy
+- ✅ Security scanning with bandit and safety
+- ✅ Docker image testing
+- ✅ Cached dependencies for faster builds
+
+**Status Badge:**
+```markdown
+![Tests](https://github.com/your-org/valheim-discord-bot/workflows/Test/badge.svg)
+```
+
+### 🛠️ Local Development
+
+For local development, you can run all checks using the provided scripts:
+
+```bash
+# Using the bash script
+./scripts/dev.sh
+
+# Using the Python script
+python scripts/dev.py
+```
+
+**Development Tools:**
+- **Code Formatting**: `black src/ test/`
+- **Import Sorting**: `isort src/ test/`
+- **Linting**: `flake8 src/ test/`
+- **Type Checking**: `mypy src/`
+- **Security Scanning**: `bandit -r src/`
+- **Vulnerability Check**: `safety check`
 
 ---
 
