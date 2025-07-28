@@ -54,7 +54,7 @@ class TestValheimBot:
             mock_channel = AsyncMock()
             mock_message = AsyncMock()
             mock_fetch_channel.return_value = mock_channel
-            
+
             # Mock fetch_message on the channel
             mock_channel.fetch_message = AsyncMock(return_value=mock_message)
 
@@ -66,8 +66,8 @@ class TestValheimBot:
             await bot_instance.on_ready()
 
             # Verify channel and message were fetched
-            mock_fetch_channel.assert_called_once_with(0)  # Default value
-            mock_channel.fetch_message.assert_called_once_with(0)  # Default value
+            mock_fetch_channel.assert_called_once_with(123456789)  # Uses patched env value
+            mock_channel.fetch_message.assert_called_once_with(987654321)  # Uses patched env value
             
             # Verify attributes were set
             assert bot_instance.channel == mock_channel
@@ -289,11 +289,10 @@ class TestValheimBot:
         try:
             # Mock the client.run method
             with patch.object(sys.modules['bot'].client, 'run', mock_run):
-                # Import the module to trigger the main execution
-                import importlib
-                import bot
-                importlib.reload(bot)
-                mock_run.assert_called_once_with(bot.TOKEN)
+                # Execute the module as __main__ to trigger the main block
+                import runpy
+                runpy.run_module('bot', run_name='__main__')
+                mock_run.assert_called_once_with('test_token')
         finally:
             # Restore original name
             sys.modules['bot'].__name__ = original_name

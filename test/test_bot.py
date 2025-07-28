@@ -43,15 +43,14 @@ class TestValheimBot(unittest.TestCase):
         self.assertEqual(self.bot.intents, self.intents)
 
     @patch('discord.Client.fetch_channel')
-    @patch('discord.abc.Messageable.fetch_message')
     @patch('logging.info')
-    def test_on_ready(self, mock_logging, mock_fetch_message, mock_fetch_channel):
+    def test_on_ready(self, mock_logging, mock_fetch_channel):
         """Test the on_ready method sets up the bot correctly."""
         # Mock the channel and message
         mock_channel = AsyncMock()
         mock_message = AsyncMock()
         mock_fetch_channel.return_value = mock_channel
-        mock_fetch_message.return_value = mock_message
+        mock_channel.fetch_message = AsyncMock(return_value=mock_message)
 
         # Mock the update_status task
         self.bot.update_status = Mock()
@@ -61,8 +60,8 @@ class TestValheimBot(unittest.TestCase):
         asyncio.run(self.bot.on_ready())
 
         # Verify channel and message were fetched
-        mock_fetch_channel.assert_called_once_with(0)  # Default value from bot.py
-        mock_fetch_message.assert_called_once_with(0)  # Default value from bot.py
+        mock_fetch_channel.assert_called_once_with(123456789)  # Uses patched env value
+        mock_channel.fetch_message.assert_called_once_with(987654321)  # Uses patched env value
         
         # Verify attributes were set
         self.assertEqual(self.bot.channel, mock_channel)
@@ -90,6 +89,7 @@ class TestValheimBot(unittest.TestCase):
 
         # Mock message
         self.bot.message = AsyncMock()
+        self.bot.message.edit = AsyncMock()
 
         # Call update_status
         asyncio.run(self.bot.update_status())
@@ -139,7 +139,6 @@ class TestValheimBot(unittest.TestCase):
         self.assertIn('🔴 **Offline / unreachable**', call_args['description'])
         
         # Verify message was edited
-        self.bot.message.edit = AsyncMock()
         self.bot.message.edit.assert_called_once_with(embed=mock_embed_instance)
 
     @patch('discord.Client.wait_until_ready')
@@ -183,11 +182,10 @@ class TestValheimBot(unittest.TestCase):
         try:
             # Mock the client.run method
             with patch.object(sys.modules['bot'].client, 'run', mock_run):
-                # Import the module to trigger the main execution
-                import importlib
-                import bot
-                importlib.reload(bot)
-                mock_run.assert_called_once_with(bot.TOKEN)
+                # Execute the module as __main__ to trigger the main block
+                import runpy
+                runpy.run_module('bot', run_name='__main__')
+                mock_run.assert_called_once_with('test_token')
         finally:
             # Restore original name
             sys.modules['bot'].__name__ = original_name
@@ -293,8 +291,8 @@ class TestValheimBot(unittest.TestCase):
 class TestValheimBotIntegration(unittest.TestCase):
     """Integration tests for ValheimBot."""
 
-    @patch('discord.Client')
-    def test_bot_creation_with_defaults(self, mock_client):
+    @patch('discord.Client.run')
+    def test_bot_creation_with_defaults(self, mock_run):
         """Test bot creation with default environment variables."""
         with patch.dict(os.environ, {
             'DISCORD_TOKEN': 'test_token',
