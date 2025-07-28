@@ -1,11 +1,11 @@
 import asyncio
 import os
 import sys
+from unittest.mock import AsyncMock, Mock, patch
 
 import a2s
 import discord
 import pytest
-from unittest.mock import AsyncMock, Mock, patch
 
 # Add src directory to path for imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
@@ -341,6 +341,7 @@ class TestValheimBot:
             with patch.object(sys.modules["bot"].client, "run", mock_run):
                 # Import the module to trigger the main execution
                 import importlib
+
                 import bot
 
                 importlib.reload(bot)
@@ -366,6 +367,7 @@ class TestValheimBotIntegration:
         ):
             # Re-import to get fresh environment variables
             import importlib
+
             import bot
 
             importlib.reload(bot)
@@ -416,6 +418,7 @@ class TestValheimBotEdgeCases:
         """Test that environment variables are converted to correct types."""
         # Re-import bot module to get fresh environment variables
         import importlib
+
         import bot
 
         importlib.reload(bot)

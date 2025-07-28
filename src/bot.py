@@ -1,6 +1,7 @@
-import os
 import asyncio
 import logging
+import os
+
 import a2s
 import discord
 from discord.ext import tasks

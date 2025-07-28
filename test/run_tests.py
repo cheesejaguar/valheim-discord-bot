@@ -57,6 +57,7 @@ def run_simple_tests():
 
     try:
         import unittest
+
         from test_bot import TestValheimBot, TestValheimBotIntegration
 
         # Create test suite

@@ -205,6 +205,7 @@ class TestValheimBot(unittest.TestCase):
             with patch.object(sys.modules["bot"].client, "run", mock_run):
                 # Import the module to trigger the main execution
                 import importlib
+
                 import bot
 
                 importlib.reload(bot)
@@ -330,6 +331,7 @@ class TestValheimBotIntegration(unittest.TestCase):
         ):
             # Re-import to get fresh environment variables
             import importlib
+
             import bot
 
             importlib.reload(bot)
