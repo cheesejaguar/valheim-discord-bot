@@ -126,15 +126,6 @@ jobs:
       run: |
         docker build -t valheim-discord-bot:test .
     
-    - name: Create .env.example for testing
-      run: |
-        echo "DISCORD_TOKEN=dummy-token" > .env.example
-        echo "DISCORD_CHANNEL_ID=0" >> .env.example
-        echo "DISCORD_MESSAGE_ID=0" >> .env.example
-        echo "VALHEIM_HOST=localhost" >> .env.example
-        echo "VALHEIM_QUERY_PORT=2457" >> .env.example
-        echo "UPDATE_PERIOD=60" >> .env.example
-
     - name: Test Docker image
       run: |
-        docker run --rm --env-file .env.example valheim-discord-bot:test python -c "import a2s; import discord; print('Docker image test passed')" 
+        docker run --rm --entrypoint python valheim-discord-bot:test -c "import a2s; import discord; print('Docker image test passed')" 
