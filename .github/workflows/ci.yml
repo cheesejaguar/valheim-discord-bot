@@ -128,5 +128,7 @@ jobs:
     
     - name: Test Docker image
       run: |
-        # Test that the image can be created and the entrypoint is correct
-        docker run --rm valheim-discord-bot:test python -c "from src.bot import ValheimBot; print('Docker image test passed')" 
+        # Test that the bot starts without immediate errors
+        timeout 5s docker run --rm -e DISCORD_TOKEN="dummy-token" valheim-discord-bot:test || \
+          if [ $? -eq 124 ]; then echo "Bot ran for 5s and was terminated as expected."; exit 0; \
+          else echo "Bot exited with an error."; exit 1; fi 
