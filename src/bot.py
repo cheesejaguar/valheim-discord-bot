@@ -33,11 +33,12 @@ ADDRESS = (HOST, PORT)
 class ValheimBot(discord.Client):
     async def on_ready(self) -> None:
         self.channel = await self.fetch_channel(CHANNEL_ID)
-        self.message = await self.channel.fetch_message(MESSAGE_ID)
+        # Type ignore because we know this is a text channel that supports fetch_message
+        self.message = await self.channel.fetch_message(MESSAGE_ID)  # type: ignore
         logging.info(f"Connected as {self.user} – monitoring {ADDRESS}")
         self.update_status.start()
 
-    @tasks.loop(seconds=UPDATE_PERIOD)  # type: ignore[misc]
+    @tasks.loop(seconds=UPDATE_PERIOD)
     async def update_status(self) -> None:
         try:
             info = await asyncio.to_thread(a2s.info, ADDRESS, timeout=3)
@@ -51,7 +52,7 @@ class ValheimBot(discord.Client):
         if self.message is not None:
             await self.message.edit(embed=embed)
 
-    @update_status.before_loop  # type: ignore[misc]
+    @update_status.before_loop
     async def before_update(self) -> None:
         await self.wait_until_ready()
 
