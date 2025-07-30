@@ -254,21 +254,30 @@ WantedBy=multi-user.target
 ## 🧱 Code Overview
 
 ```mermaid
-flowchart TD
+graph TD
     subgraph Discord API
-        A[Gateway WS] -- embeds --> Bot
+        A[Gateway WS] -- embeds --> B((Bot))
     end
-    subgraph Bot
-        B[asyncio task<br>update_status()] --> C[Steam A2S Query]
-        C --> D(Valheim Server)
-    end
-    D -- info --> C
-    C -- status --> B --> A
-```
 
-* **`ValheimBot`** subclass of `discord.Client`  
-* **`tasks.loop`** polls the server asynchronously  
-* **Exception handling** wraps queries so time‑outs don’t kill the loop.
+    subgraph Bot
+        B -- periodically polls --> C{Steam A2S Query}
+        C -- status --> B
+    end
+    
+    subgraph Valheim Server
+        D[Server]
+    end
+
+    C -- UDP --> D
+    D -- info --> C
+
+    subgraph Notes
+        direction LR
+        note1[ValheimBot subclass of discord.Client]
+        note2[tasks.loop polls server asynchronously]
+        note3["Exception handling wraps queries,<br>so time-outs don’t kill the loop."]
+    end
+```
 
 ---
 
