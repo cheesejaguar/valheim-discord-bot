@@ -112,9 +112,7 @@ async def test_update_status_offline(mock_embed, mock_to_thread, bot_instance):
 
     mock_to_thread.assert_called_once_with(a2s.info, bot.ADDRESS, timeout=3)
     mock_embed.assert_called_once()
-    assert (
-        "🔴 **Offline / unreachable**" in mock_embed.call_args.kwargs["description"]
-    )
+    assert "🔴 **Offline / unreachable**" in mock_embed.call_args.kwargs["description"]
     bot_instance.message.edit.assert_called_once_with(embed=mock_embed_instance)
 
 
@@ -187,9 +185,7 @@ async def test_update_status_exception_handling(
 
     mock_to_thread.assert_called_once_with(a2s.info, bot.ADDRESS, timeout=3)
     mock_embed.assert_called_once()
-    assert (
-        "🔴 **Offline / unreachable**" in mock_embed.call_args.kwargs["description"]
-    )
+    assert "🔴 **Offline / unreachable**" in mock_embed.call_args.kwargs["description"]
     bot_instance.message.edit.assert_called_once_with(embed=mock_embed_instance)
 
 

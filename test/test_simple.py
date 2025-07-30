@@ -7,9 +7,9 @@ import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
-import bot
-
 import runpy
+
+import bot
 
 
 @patch("discord.Client.run")
