@@ -6,7 +6,7 @@ WORKDIR /w
 
 # Install deps to a throw‑away location
 COPY requirements.txt .
-RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code last (keeps cache hot)
 COPY src/ ./src/
@@ -16,7 +16,7 @@ COPY src/ ./src/
 FROM gcr.io/distroless/python3-debian12:nonroot
 
 # Bring in site‑packages and application
-COPY --from=builder /install /usr/local
+COPY --from=builder /usr/local /usr/local
 COPY --from=builder /w/src/ /app/src/
 WORKDIR /app
 
