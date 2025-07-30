@@ -62,11 +62,12 @@ def test_bot_instantiation(mock_client):
 @pytest.mark.asyncio
 async def test_on_ready(bot_instance):
     """Test the on_ready method sets up the bot correctly."""
-    bot_instance.fetch_channel = AsyncMock()
-    mock_channel = AsyncMock()
+    # Create a mock that is an instance of discord.TextChannel
+    mock_channel = Mock(spec=discord.TextChannel)
     mock_message = AsyncMock()
-    bot_instance.fetch_channel.return_value = mock_channel
     mock_channel.fetch_message = AsyncMock(return_value=mock_message)
+
+    bot_instance.fetch_channel = AsyncMock(return_value=mock_channel)
     bot_instance.update_status = Mock()
     bot_instance.update_status.start = Mock()
 
