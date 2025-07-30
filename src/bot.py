@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import os
+from typing import Union
 
 import a2s
 import discord
@@ -10,7 +11,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 # Helper function to clean environment variables
-def clean_env_var(value: str | None, default: str = "") -> str:
+def clean_env_var(value: Union[str, None], default: str = "") -> str:
     """Clean environment variable by removing comments and whitespace."""
     if value is None:
         return default
