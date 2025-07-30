@@ -77,7 +77,7 @@ python_functions = ["test_*"]
 addopts = [
     "--verbose",
     "--tb=short",
-    "--cov=src.bot",
+    "--cov=bot",
     "--cov-report=term-missing",
     "--cov-report=html",
     "--cov-report=xml",
