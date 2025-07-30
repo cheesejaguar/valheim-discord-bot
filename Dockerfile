@@ -26,4 +26,3 @@ ENTRYPOINT ["python3", "/app/src/bot.py"]
 # Harden further
 USER nonroot:nonroot       # already the default tag, but explicit is better
 ENV PYTHONUNBUFFERED=1
-READONLY_ROOT_FILESYSTEM true
