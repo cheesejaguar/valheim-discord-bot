@@ -34,7 +34,9 @@ class ValheimBot(discord.Client):
     async def on_ready(self) -> None:
         self.channel = await self.fetch_channel(CHANNEL_ID)
         # Type ignore because we know this is a text channel that supports fetch_message
-        self.message = await self.channel.fetch_message(MESSAGE_ID)  # type: ignore
+        self.message = await self.channel.fetch_message(  # type: ignore[union-attr]
+            MESSAGE_ID
+        )
         logging.info(f"Connected as {self.user} – monitoring {ADDRESS}")
         self.update_status.start()
 
