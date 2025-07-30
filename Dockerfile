@@ -24,5 +24,5 @@ WORKDIR /app
 ENTRYPOINT ["python3", "/app/src/bot.py"]
 
 # Harden further
-USER nonroot:nonroot       # already the default tag, but explicit is better
+USER nonroot:nonroot
 ENV PYTHONUNBUFFERED=1
