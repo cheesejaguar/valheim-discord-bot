@@ -1,6 +1,6 @@
-import asyncio
 import importlib
 import os
+import runpy
 import sys
 from unittest.mock import AsyncMock, Mock, patch
 
@@ -10,7 +10,7 @@ import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
-import bot
+import bot  # noqa: E402
 
 
 @pytest.fixture(autouse=True)
@@ -187,9 +187,6 @@ async def test_update_status_exception_handling(
     mock_embed.assert_called_once()
     assert "🔴 **Offline / unreachable**" in mock_embed.call_args.kwargs["description"]
     bot_instance.message.edit.assert_called_once_with(embed=mock_embed_instance)
-
-
-import runpy
 
 
 @patch("discord.Client.run")
