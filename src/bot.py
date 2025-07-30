@@ -8,12 +8,20 @@ from discord.ext import tasks
 
 logging.basicConfig(level=logging.INFO)
 
-TOKEN = os.getenv("DISCORD_TOKEN")
-CHANNEL_ID = int(os.getenv("DISCORD_CHANNEL_ID", "0"))
-MESSAGE_ID = int(os.getenv("DISCORD_MESSAGE_ID", "0"))
-HOST = os.getenv("VALHEIM_HOST", "localhost")
-PORT = int(os.getenv("VALHEIM_QUERY_PORT", "2457"))
-UPDATE_PERIOD = int(os.getenv("UPDATE_PERIOD", "60"))
+# Helper function to clean environment variables
+def clean_env_var(value: str | None, default: str = "") -> str:
+    """Clean environment variable by removing comments and whitespace."""
+    if value is None:
+        return default
+    # Split on '#' to remove inline comments, then strip whitespace
+    return value.split('#')[0].strip() or default
+
+TOKEN = clean_env_var(os.getenv("DISCORD_TOKEN"))
+CHANNEL_ID = int(clean_env_var(os.getenv("DISCORD_CHANNEL_ID"), "0"))
+MESSAGE_ID = int(clean_env_var(os.getenv("DISCORD_MESSAGE_ID"), "0"))
+HOST = clean_env_var(os.getenv("VALHEIM_HOST"), "localhost")
+PORT = int(clean_env_var(os.getenv("VALHEIM_QUERY_PORT"), "2457"))
+UPDATE_PERIOD = int(clean_env_var(os.getenv("UPDATE_PERIOD"), "60"))
 
 ADDRESS = (HOST, PORT)
 
