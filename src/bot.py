@@ -8,13 +8,15 @@ from discord.ext import tasks
 
 logging.basicConfig(level=logging.INFO)
 
+
 # Helper function to clean environment variables
 def clean_env_var(value: str | None, default: str = "") -> str:
     """Clean environment variable by removing comments and whitespace."""
     if value is None:
         return default
     # Split on '#' to remove inline comments, then strip whitespace
-    return value.split('#')[0].strip() or default
+    return value.split("#")[0].strip() or default
+
 
 TOKEN = clean_env_var(os.getenv("DISCORD_TOKEN"))
 CHANNEL_ID = int(clean_env_var(os.getenv("DISCORD_CHANNEL_ID"), "0"))
