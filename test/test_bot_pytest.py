@@ -81,6 +81,24 @@ async def test_on_ready(bot_instance):
 
 
 @pytest.mark.asyncio
+async def test_on_ready_invalid_channel(bot_instance, caplog):
+    """Test on_ready with an invalid channel type."""
+    # Simulate fetch_channel returning a non-text channel
+    mock_channel = Mock(spec=discord.VoiceChannel)  # Or any other non-text channel
+    bot_instance.fetch_channel = AsyncMock(return_value=mock_channel)
+    bot_instance.update_status = Mock()
+    bot_instance.update_status.start = Mock()
+
+    with caplog.at_level("ERROR"):
+        await bot_instance.on_ready()
+
+    assert f"Channel {bot.CHANNEL_ID} is not a text channel or thread." in caplog.text
+    assert bot_instance.message is None
+    mock_channel.fetch_message.assert_not_called()
+    bot_instance.update_status.start.assert_called_once()
+
+
+@pytest.mark.asyncio
 @patch("asyncio.to_thread")
 @patch("discord.Embed")
 async def test_update_status_online(mock_embed, mock_to_thread, bot_instance):
