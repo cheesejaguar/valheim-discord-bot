@@ -2,7 +2,7 @@ import importlib
 import os
 import runpy
 import sys
-from unittest.mock import AsyncMock, Mock, patch, call
+from unittest.mock import AsyncMock, Mock, call, patch
 
 import a2s
 import discord
