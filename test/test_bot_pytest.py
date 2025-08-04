@@ -2,7 +2,7 @@ import importlib
 import os
 import runpy
 import sys
-from unittest.mock import AsyncMock, Mock, patch
+from unittest.mock import AsyncMock, Mock, call, patch
 
 import a2s
 import discord
@@ -103,18 +103,40 @@ async def test_on_ready_invalid_channel(bot_instance, caplog):
 @patch("discord.Embed")
 async def test_update_status_online(mock_embed, mock_to_thread, bot_instance):
     """Test update_status when the server is online."""
-    mock_info = Mock(player_count=5, max_players=10, server_name="Test Server")
-    mock_to_thread.return_value = mock_info
+    mock_info = Mock(
+        player_count=5,
+        max_players=10,
+        server_name="Test Server",
+        version="0.217.46",
+        password_protected=True,
+    )
+    mock_rules = {"world_name": "Midgard", "uptime": "1h23m", "map_enabled": "1"}
+    mock_to_thread.side_effect = [mock_info, mock_rules]
     mock_embed_instance = Mock()
     mock_embed.return_value = mock_embed_instance
     bot_instance.message = AsyncMock()
 
     await bot_instance.update_status()
 
-    mock_to_thread.assert_called_once_with(a2s.info, bot.ADDRESS, timeout=3)
+    expected_description = (
+        "🟢 **Online**\n"
+        "👥 5/10 players\n"
+        "🛠️ Version: 0.217.46\n"
+        "🔐 Password: Required\n"
+        "🌍 World: Midgard\n"
+        "⏱️ Uptime: 1h23m\n"
+        "🗺️ Map: Visible"
+    )
+
+    mock_to_thread.assert_has_calls(
+        [
+            call(a2s.info, bot.ADDRESS, timeout=3),
+            call(a2s.rules, bot.ADDRESS, timeout=3),
+        ]
+    )
     mock_embed.assert_called_once_with(
         title="⚔️ Test Server",
-        description="🟢 **Online** – 5/10 players",
+        description=expected_description,
     )
     mock_embed_instance.add_field.assert_called_once_with(
         name="🌍 Address", value=f"`{bot.HOST}:{bot.PORT}`", inline=False
@@ -159,11 +181,11 @@ async def test_before_update(bot_instance):
 @patch("asyncio.to_thread")
 @patch("discord.Embed")
 @pytest.mark.parametrize(
-    "player_count, max_players, expected_status",
+    "player_count, max_players, players_line",
     [
-        (0, 10, "🟢 **Online** – 0/10 players"),
-        (1, 1, "🟢 **Online** – 1/1 players"),
-        (10, 10, "🟢 **Online** – 10/10 players"),
+        (0, 10, "👥 0/10 players"),
+        (1, 1, "👥 1/1 players"),
+        (10, 10, "👥 10/10 players"),
     ],
 )
 async def test_update_status_player_counts(
@@ -172,24 +194,42 @@ async def test_update_status_player_counts(
     bot_instance,
     player_count,
     max_players,
-    expected_status,
+    players_line,
 ):
     """Test update_status with various player counts."""
     mock_info = Mock(
         player_count=player_count,
         max_players=max_players,
         server_name="Test Server",
+        version="0.217.46",
+        password_protected=False,
     )
-    mock_to_thread.return_value = mock_info
+    mock_rules = {"world_name": "Midgard", "uptime": "1h23m", "map_enabled": "1"}
+    mock_to_thread.side_effect = [mock_info, mock_rules]
     bot_instance.message = AsyncMock()
     mock_embed_instance = Mock()
     mock_embed.return_value = mock_embed_instance
 
     await bot_instance.update_status()
 
-    mock_to_thread.assert_called_once_with(a2s.info, bot.ADDRESS, timeout=3)
+    expected_description = (
+        "🟢 **Online**\n"
+        f"{players_line}\n"
+        "🛠️ Version: 0.217.46\n"
+        "🔐 Password: Not required\n"
+        "🌍 World: Midgard\n"
+        "⏱️ Uptime: 1h23m\n"
+        "🗺️ Map: Visible"
+    )
+
+    mock_to_thread.assert_has_calls(
+        [
+            call(a2s.info, bot.ADDRESS, timeout=3),
+            call(a2s.rules, bot.ADDRESS, timeout=3),
+        ]
+    )
     mock_embed.assert_called_once_with(
-        title="⚔️ Test Server", description=expected_status
+        title="⚔️ Test Server", description=expected_description
     )
     mock_embed_instance.add_field.assert_called_once_with(
         name="🌍 Address", value=f"`{bot.HOST}:{bot.PORT}`", inline=False
