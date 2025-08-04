@@ -4,7 +4,6 @@ Development script for running all checks locally.
 This is a Python alternative to the bash script.
 """
 
-import os
 import subprocess
 import sys
 from pathlib import Path
@@ -14,7 +13,9 @@ def run_command(cmd, description, check=True):
     """Run a command and handle errors."""
     print(f"  - {description}...")
     try:
-        result = subprocess.run(cmd, shell=True, check=check, capture_output=True, text=True)
+        result = subprocess.run(
+            cmd, shell=True, check=check, capture_output=True, text=True
+        )
         if result.stdout:
             print(result.stdout)
         return result.returncode == 0
@@ -42,23 +43,35 @@ def main():
         import mypy
     except ImportError:
         print("📦 Installing development dependencies...")
-        run_command("pip install -r requirements-dev.txt", "Installing dev dependencies")
+        run_command(
+            "pip install -r requirements-dev.txt", "Installing dev dependencies"
+        )
 
     print("🔍 Running linting checks...")
 
     # Run black formatting check
-    if not run_command("black --check src/ test/", "Checking code formatting with black"):
+    if not run_command(
+        "black --check src/ test/", "Checking code formatting with black"
+    ):
         print("❌ Code formatting issues found. Run 'black src/ test/' to fix.")
         sys.exit(1)
 
     # Run isort import sorting check
-    if not run_command("isort --check-only src/ test/", "Checking import sorting with isort"):
+    if not run_command(
+        "isort --check-only src/ test/", "Checking import sorting with isort"
+    ):
         print("❌ Import sorting issues found. Run 'isort src/ test/' to fix.")
         sys.exit(1)
 
     # Run flake8 linting
-    run_command("flake8 src/ test/ --count --select=E9,F63,F7,F82 --show-source --statistics", "Running flake8 syntax check")
-    run_command("flake8 src/ test/ --count --exit-zero --max-complexity=10 --max-line-length=88 --statistics", "Running flake8 style check")
+    run_command(
+        "flake8 src/ test/ --count --select=E9,F63,F7,F82 --show-source --statistics",
+        "Running flake8 syntax check",
+    )
+    run_command(
+        "flake8 src/ test/ --count --exit-zero --max-complexity=10 --max-line-length=88 --statistics",
+        "Running flake8 style check",
+    )
 
     # Run mypy type checking
     run_command("mypy src/ --ignore-missing-imports", "Running mypy type checking")
@@ -66,15 +79,26 @@ def main():
     print("🔒 Running security checks...")
 
     # Run bandit security scanning
-    run_command("bandit -r src/ -f json -o bandit-report.json", "Running bandit security scan", check=False)
+    run_command(
+        "bandit -r src/ -f json -o bandit-report.json",
+        "Running bandit security scan",
+        check=False,
+    )
 
     # Run safety vulnerability check
-    run_command("safety check --json --output safety-report.json", "Running safety vulnerability check", check=False)
+    run_command(
+        "safety check --json --output safety-report.json",
+        "Running safety vulnerability check",
+        check=False,
+    )
 
     print("🧪 Running tests...")
 
     # Run tests with pytest
-    if not run_command("pytest test/ --cov=src.bot --cov-report=term-missing --cov-fail-under=100", "Running pytest tests"):
+    if not run_command(
+        "pytest test/ --cov=src.bot --cov-report=term-missing --cov-fail-under=100",
+        "Running pytest tests",
+    ):
         print("❌ Tests failed!")
         sys.exit(1)
 
@@ -86,7 +110,9 @@ def main():
     print("🐳 Testing Docker build...")
 
     # Test Docker build
-    if not run_command("docker build -t valheim-discord-bot:dev .", "Building Docker image"):
+    if not run_command(
+        "docker build -t valheim-discord-bot:dev .", "Building Docker image"
+    ):
         print("❌ Docker build failed!")
         sys.exit(1)
 
@@ -96,4 +122,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main() 
+    main()

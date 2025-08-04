@@ -10,14 +10,14 @@ import sys
 def check_black():
     """Check if all files are properly formatted with black."""
     print("🔍 Checking black formatting...")
-    
+
     try:
         result = subprocess.run(
             ["python", "-m", "black", "--check", "src/", "test/"],
             capture_output=True,
             text=True,
         )
-        
+
         if result.returncode == 0:
             print("✅ All files are properly formatted with black!")
             return True
@@ -33,14 +33,14 @@ def check_black():
 def check_isort():
     """Check if all imports are properly sorted with isort."""
     print("🔍 Checking import sorting...")
-    
+
     try:
         result = subprocess.run(
             ["python", "-m", "isort", "--check-only", "src/", "test/"],
             capture_output=True,
             text=True,
         )
-        
+
         if result.returncode == 0:
             print("✅ All imports are properly sorted!")
             return True
@@ -57,10 +57,10 @@ def main():
     """Run all formatting checks."""
     print("🧪 Running formatting checks...")
     print("=" * 40)
-    
+
     black_ok = check_black()
     isort_ok = check_isort()
-    
+
     if black_ok and isort_ok:
         print("\n✅ All formatting checks passed!")
         return 0
@@ -70,4 +70,4 @@ def main():
 
 
 if __name__ == "__main__":
-    sys.exit(main()) 
+    sys.exit(main())

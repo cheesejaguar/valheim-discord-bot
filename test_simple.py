@@ -12,11 +12,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "src"))
 try:
     from bot import (
         ADDRESS,
-        CHANNEL_ID,
         HOST,
-        MESSAGE_ID,
         PORT,
-        TOKEN,
         UPDATE_PERIOD,
         ValheimBot,
     )
@@ -38,4 +35,4 @@ except Exception as e:
     print(f"❌ Error: {e}")
     import traceback
 
-    traceback.print_exc() 
+    traceback.print_exc()
