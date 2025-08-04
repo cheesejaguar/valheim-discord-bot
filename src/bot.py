@@ -105,6 +105,21 @@ class ValheimBot(discord.Client):
             status_line = "🔴 **Offline / unreachable**"
             title = "⚠️ Valheim Server"
             embed = discord.Embed(title=title, description=status_line)
+            # Add all fields with placeholder values for offline status
+            embed.add_field(
+                name="👥 Players",
+                value="Unknown",
+                inline=True,
+            )
+            embed.add_field(name="🛠️ Version", value="Unknown", inline=True)
+            embed.add_field(
+                name="🔒 Password",
+                value="Unknown",
+                inline=True,
+            )
+            embed.add_field(name="🌍 World", value="Unknown", inline=True)
+            embed.add_field(name="⏱️ Uptime", value="Unknown", inline=True)
+            embed.add_field(name="🗺️ Map", value="Unknown", inline=True)
 
         embed.add_field(name="🌍 Address", value=f"`{HOST}:{PORT}`", inline=False)
         if self.message is not None:
