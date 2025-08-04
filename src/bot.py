@@ -58,7 +58,8 @@ class ValheimBot(discord.Client):
                 f"🟢 **Online** – {info.player_count}/{info.max_players} players"
             )
             title = f"⚔️ {info.server_name}"
-            embed = discord.Embed(title=title, description=status_line)
+            embed.title = title
+            embed.description = status_line
 
             embed.add_field(
                 name="👥 Players",
