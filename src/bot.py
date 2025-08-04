@@ -48,8 +48,34 @@ class ValheimBot(discord.Client):
     async def update_status(self) -> None:
         try:
             info = await asyncio.to_thread(a2s.info, ADDRESS, timeout=3)
+            try:
+                rules = await asyncio.to_thread(a2s.rules, ADDRESS, timeout=3)
+            except Exception:
+                rules = {}
+
+            world_name = (
+                rules.get("world_name")
+                or rules.get("world")
+                or getattr(info, "map_name", "Unknown")
+                or "Unknown"
+            )
+            uptime = rules.get("uptime", "Unknown")
+            map_enabled_raw = str(rules.get("map_enabled", "1")).lower()
+            map_visible = map_enabled_raw in {"1", "true", "yes"}
+            password_required = bool(
+                getattr(info, "password_protected", False)
+                or str(rules.get("password_required", "")).lower()
+                in {"1", "true", "yes"}
+            )
+
             status_line = (
-                f"🟢 **Online** – {info.player_count}/{info.max_players} players"
+                "🟢 **Online**\n"
+                f"👥 {info.player_count}/{info.max_players} players\n"
+                f"🛠️ Version: {getattr(info, 'version', 'Unknown')}\n"
+                f"🔐 Password: {'Required' if password_required else 'Not required'}\n"
+                f"🌍 World: {world_name}\n"
+                f"⏱️ Uptime: {uptime}\n"
+                f"🗺️ Map: {'Visible' if map_visible else 'Hidden'}"
             )
             title = f"⚔️ {info.server_name}"
         except Exception:
