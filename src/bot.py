@@ -51,10 +51,13 @@ class ValheimBot(discord.Client):
             status_line = (
                 f"🟢 **Online** – {info.player_count}/{info.max_players} players"
             )
+            title = f"⚔️ {info.server_name}"
         except Exception:
             status_line = "🔴 **Offline / unreachable**"
+            title = "⚠️ Valheim Server"
 
-        embed = discord.Embed(description=status_line)
+        embed = discord.Embed(title=title, description=status_line)
+        embed.add_field(name="🌍 Address", value=f"`{HOST}:{PORT}`", inline=False)
         if self.message is not None:
             await self.message.edit(embed=embed)
 

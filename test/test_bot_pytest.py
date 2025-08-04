@@ -103,7 +103,7 @@ async def test_on_ready_invalid_channel(bot_instance, caplog):
 @patch("discord.Embed")
 async def test_update_status_online(mock_embed, mock_to_thread, bot_instance):
     """Test update_status when the server is online."""
-    mock_info = Mock(player_count=5, max_players=10)
+    mock_info = Mock(player_count=5, max_players=10, server_name="Test Server")
     mock_to_thread.return_value = mock_info
     mock_embed_instance = Mock()
     mock_embed.return_value = mock_embed_instance
@@ -112,8 +112,13 @@ async def test_update_status_online(mock_embed, mock_to_thread, bot_instance):
     await bot_instance.update_status()
 
     mock_to_thread.assert_called_once_with(a2s.info, bot.ADDRESS, timeout=3)
-    mock_embed.assert_called_once()
-    assert "🟢 **Online** – 5/10 players" in mock_embed.call_args.kwargs["description"]
+    mock_embed.assert_called_once_with(
+        title="⚔️ Test Server",
+        description="🟢 **Online** – 5/10 players",
+    )
+    mock_embed_instance.add_field.assert_called_once_with(
+        name="🌍 Address", value=f"`{bot.HOST}:{bot.PORT}`", inline=False
+    )
     bot_instance.message.edit.assert_called_once_with(embed=mock_embed_instance)
 
 
@@ -130,8 +135,13 @@ async def test_update_status_offline(mock_embed, mock_to_thread, bot_instance):
     await bot_instance.update_status()
 
     mock_to_thread.assert_called_once_with(a2s.info, bot.ADDRESS, timeout=3)
-    mock_embed.assert_called_once()
-    assert "🔴 **Offline / unreachable**" in mock_embed.call_args.kwargs["description"]
+    mock_embed.assert_called_once_with(
+        title="⚠️ Valheim Server",
+        description="🔴 **Offline / unreachable**",
+    )
+    mock_embed_instance.add_field.assert_called_once_with(
+        name="🌍 Address", value=f"`{bot.HOST}:{bot.PORT}`", inline=False
+    )
     bot_instance.message.edit.assert_called_once_with(embed=mock_embed_instance)
 
 
@@ -165,7 +175,11 @@ async def test_update_status_player_counts(
     expected_status,
 ):
     """Test update_status with various player counts."""
-    mock_info = Mock(player_count=player_count, max_players=max_players)
+    mock_info = Mock(
+        player_count=player_count,
+        max_players=max_players,
+        server_name="Test Server",
+    )
     mock_to_thread.return_value = mock_info
     bot_instance.message = AsyncMock()
     mock_embed_instance = Mock()
@@ -174,8 +188,12 @@ async def test_update_status_player_counts(
     await bot_instance.update_status()
 
     mock_to_thread.assert_called_once_with(a2s.info, bot.ADDRESS, timeout=3)
-    mock_embed.assert_called_once()
-    assert expected_status in mock_embed.call_args.kwargs["description"]
+    mock_embed.assert_called_once_with(
+        title="⚔️ Test Server", description=expected_status
+    )
+    mock_embed_instance.add_field.assert_called_once_with(
+        name="🌍 Address", value=f"`{bot.HOST}:{bot.PORT}`", inline=False
+    )
     bot_instance.message.edit.assert_called_once_with(embed=mock_embed_instance)
 
 
@@ -203,8 +221,13 @@ async def test_update_status_exception_handling(
     await bot_instance.update_status()  # Should not raise
 
     mock_to_thread.assert_called_once_with(a2s.info, bot.ADDRESS, timeout=3)
-    mock_embed.assert_called_once()
-    assert "🔴 **Offline / unreachable**" in mock_embed.call_args.kwargs["description"]
+    mock_embed.assert_called_once_with(
+        title="⚠️ Valheim Server",
+        description="🔴 **Offline / unreachable**",
+    )
+    mock_embed_instance.add_field.assert_called_once_with(
+        name="🌍 Address", value=f"`{bot.HOST}:{bot.PORT}`", inline=False
+    )
     bot_instance.message.edit.assert_called_once_with(embed=mock_embed_instance)
 
 
