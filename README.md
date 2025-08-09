@@ -169,7 +169,7 @@ The project includes GitHub Actions workflows for automated testing:
 **Features:**
 - ✅ Multi-Python version testing (3.9, 3.10, 3.11, 3.12)
 - ✅ Code coverage reporting
-- ✅ Linting with flake8, black, isort, mypy
+- ✅ Linting with black, isort, mypy
 - ✅ Security scanning with bandit and safety
 - ✅ Docker image testing
 - ✅ Cached dependencies for faster builds
@@ -194,8 +194,8 @@ python scripts/dev.py
 **Development Tools:**
 - **Code Formatting**: `black src/ test/`
 - **Import Sorting**: `isort src/ test/`
-- **Linting**: `flake8 src/ test/`
-- **Type Checking**: `mypy src/`
+- **Linting**: `ruff check src/ test/`
+- **Type Checking**: `mypy src/ --ignore-missing-imports`
 - **Security Scanning**: `bandit -r src/`
 - **Vulnerability Check**: `safety check`
 

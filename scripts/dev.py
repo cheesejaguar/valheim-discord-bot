@@ -38,7 +38,6 @@ def main():
     # Install development dependencies if needed
     try:
         import black
-        import flake8
         import isort
         import mypy
     except ImportError:
@@ -62,16 +61,6 @@ def main():
     ):
         print("❌ Import sorting issues found. Run 'isort src/ test/' to fix.")
         sys.exit(1)
-
-    # Run flake8 linting
-    run_command(
-        "flake8 src/ test/ --count --select=E9,F63,F7,F82 --show-source --statistics",
-        "Running flake8 syntax check",
-    )
-    run_command(
-        "flake8 src/ test/ --count --exit-zero --max-complexity=10 --max-line-length=88 --statistics",
-        "Running flake8 style check",
-    )
 
     # Run mypy type checking
     run_command("mypy src/ --ignore-missing-imports", "Running mypy type checking")

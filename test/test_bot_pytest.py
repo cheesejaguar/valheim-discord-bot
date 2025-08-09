@@ -110,7 +110,11 @@ async def test_update_status_online(mock_embed, mock_to_thread, bot_instance):
         version="0.217.46",
         password_protected=True,
     )
-    mock_rules = {"world_name": "Midgard", "uptime": "1h23m", "map_enabled": "1"}
+    mock_rules = {
+        "world_name": "Midgard",
+        "uptime": "1h23m",
+        "map_enabled": "1",
+    }
     mock_to_thread.side_effect = [mock_info, mock_rules]
     mock_embed_instance = Mock()
     mock_embed.return_value = mock_embed_instance
@@ -168,6 +172,52 @@ async def test_update_status_offline(mock_embed, mock_to_thread, bot_instance):
 
 
 @pytest.mark.asyncio
+@patch("asyncio.to_thread")
+@patch("discord.Embed")
+async def test_update_status_rules_fails(mock_embed, mock_to_thread, bot_instance):
+    """Test update_status when a2s.info succeeds but a2s.rules fails."""
+    mock_info = Mock(
+        player_count=2,
+        max_players=10,
+        server_name="Test Server Rules-Fail",
+        version="0.217.47",
+        password_protected=False,
+        map_name="Valheim",
+    )
+    mock_to_thread.side_effect = [mock_info, Exception("Failed to get rules")]
+    mock_embed_instance = Mock()
+    mock_embed.return_value = mock_embed_instance
+    bot_instance.message = AsyncMock()
+
+    await bot_instance.update_status()
+
+    expected_description = (
+        "🟢 **Online**\n"
+        "👥 2/10 players\n"
+        "🛠️ Version: 0.217.47\n"
+        "🔐 Password: Not required\n"
+        "🌍 World: Valheim\n"  # Falls back to info.map_name
+        "⏱️ Uptime: Unknown\n"  # Falls back to default
+        "🗺️ Map: Visible"  # Falls back to default
+    )
+
+    mock_to_thread.assert_has_calls(
+        [
+            call(a2s.info, bot.ADDRESS, timeout=3),
+            call(a2s.rules, bot.ADDRESS, timeout=3),
+        ]
+    )
+    mock_embed.assert_called_once_with(
+        title="⚔️ Test Server Rules-Fail",
+        description=expected_description,
+    )
+    mock_embed_instance.add_field.assert_called_once_with(
+        name="🌍 Address", value=f"`{bot.HOST}:{bot.PORT}`", inline=False
+    )
+    bot_instance.message.edit.assert_called_once_with(embed=mock_embed_instance)
+
+
+@pytest.mark.asyncio
 async def test_before_update(bot_instance):
     """Test the before_update method."""
     bot_instance.wait_until_ready = AsyncMock()
@@ -204,7 +254,11 @@ async def test_update_status_player_counts(
         version="0.217.46",
         password_protected=False,
     )
-    mock_rules = {"world_name": "Midgard", "uptime": "1h23m", "map_enabled": "1"}
+    mock_rules = {
+        "world_name": "Midgard",
+        "uptime": "1h23m",
+        "map_enabled": "1",
+    }
     mock_to_thread.side_effect = [mock_info, mock_rules]
     bot_instance.message = AsyncMock()
     mock_embed_instance = Mock()
@@ -273,7 +327,9 @@ async def test_update_status_exception_handling(
 
 @patch("discord.Client.run")
 def test_main_execution(mock_run):
-    """Running the module as a script should call client.run once with the token."""
+    """
+    Running the module as a script should call client.run once with the token.
+    """
 
     # Ensure environment has a token so the code path executes.
     with patch.dict(os.environ, {"DISCORD_TOKEN": "test_token"}):

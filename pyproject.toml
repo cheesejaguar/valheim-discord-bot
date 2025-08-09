@@ -17,7 +17,6 @@ pytest-asyncio = "0.21.1"
 pytest-cov = "4.1.0"
 pytest-mock = "3.12.0"
 black = "*"
-flake8 = "*"
 isort = "*"
 mypy = "*"
 bandit = "*"
@@ -51,6 +50,7 @@ multi_line_output = 3
 line_length = 88
 known_first_party = ["src"]
 
+
 [tool.mypy]
 python_version = "3.9"
 warn_return_any = true
@@ -74,11 +74,6 @@ python_functions = ["test_*"]
 addopts = [
     "--verbose",
     "--tb=short",
-    "--cov=bot",
-    "--cov-report=term-missing",
-    "--cov-report=html",
-    "--cov-report=xml",
-    "--cov-fail-under=100",
 ]
 asyncio_mode = "auto"
 

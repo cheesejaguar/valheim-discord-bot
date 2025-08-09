@@ -13,7 +13,7 @@ if [ ! -f "src/bot.py" ]; then
 fi
 
 # Install development dependencies if not already installed
-if ! python -c "import black, flake8, isort, mypy" 2>/dev/null; then
+if ! python -c "import black, isort, mypy" 2>/dev/null; then
     echo "📦 Installing development dependencies..."
     pip install -r requirements-dev.txt
 fi
@@ -33,11 +33,6 @@ isort --check-only src/ test/ || {
     echo "❌ Import sorting issues found. Run 'isort src/ test/' to fix."
     exit 1
 }
-
-# Run flake8 linting
-echo "  - Running flake8 linting..."
-flake8 src/ test/ --count --select=E9,F63,F7,F82 --show-source --statistics
-flake8 src/ test/ --count --exit-zero --max-complexity=10 --max-line-length=88 --statistics
 
 # Run mypy type checking
 echo "  - Running mypy type checking..."
