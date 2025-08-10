@@ -1,3 +1,4 @@
 # exact versions keep your image reproducible
 discord.py==2.4.0
 python-a2s==1.4.1
+Flask==3.0.3
