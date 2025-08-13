@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 ######################## 1. builder ########################
-FROM python:3.12-slim AS builder
+FROM python:3.12-slim-bookworm AS builder
 WORKDIR /w
 
 # Install deps to a throw‑away location
