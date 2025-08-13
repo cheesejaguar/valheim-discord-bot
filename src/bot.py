@@ -97,4 +97,15 @@ intents = discord.Intents.none()  # no privileged intents needed
 client = ValheimBot(intents=intents)
 
 if __name__ == "__main__":
+    # Start a tiny Flask health server for Docker/K8s
+    health_host = os.getenv("HEALTH_HOST", "0.0.0.0")
+    health_port = int(os.getenv("HEALTH_PORT", "8080"))
+    import importlib
+
+    try:
+        _health_mod = importlib.import_module("src.health")
+    except Exception:
+        _health_mod = importlib.import_module("health")
+
+    _health_mod.start_health_server(host=health_host, port=health_port)
     client.run(TOKEN)
