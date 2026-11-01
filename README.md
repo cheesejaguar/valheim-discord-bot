@@ -24,12 +24,10 @@ valheim-discord-bot/
 ├─ src/
 │  └─ bot.py                # main application (async Discord client)
 ├─ test/
-│  ├─ test_bot.py           # unittest-based tests
-│  ├─ test_bot_pytest.py    # pytest-based tests (recommended)
-│  └─ run_tests.py          # test runner script
+│  └─ test_bot_pytest.py    # pytest tests (bot + health server)
 ├─ requirements.txt          # pinned dependencies
 ├─ requirements-test.txt     # test dependencies
-├─ pytest.ini              # pytest configuration
+├─ pyproject.toml          # pytest, coverage, lint configuration
 ├─ Dockerfile               # multi‑stage, distroless build
 ├─ .dockerignore            # ignore cache, VCS, secrets
 └─ README.md                # you are here
@@ -137,14 +135,8 @@ The project includes comprehensive unit tests with 100% code coverage:
 # Install test dependencies
 pip install -r requirements-test.txt
 
-# Run all tests with coverage
-python test/run_tests.py
-
-# Or run with pytest directly
-pytest --cov=src.bot --cov-report=html
-
-# Run simple tests without pytest
-python test/run_tests.py --simple
+# Run all tests (coverage of src/bot.py and src/health.py must be 100%)
+pytest
 ```
 
 **Test Coverage:**

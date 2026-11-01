@@ -85,7 +85,7 @@ def main():
 
     # Run tests with pytest
     if not run_command(
-        "pytest test/ --cov=src.bot --cov-report=term-missing --cov-fail-under=100",
+        "pytest test/",
         "Running pytest tests",
     ):
         print("❌ Tests failed!")
