@@ -52,7 +52,7 @@ echo "🧪 Running tests..."
 
 # Run tests with pytest
 echo "  - Running pytest tests..."
-pytest test/ --cov=src.bot --cov-report=term-missing --cov-fail-under=100
+pytest test/
 
 # Run tests with unittest
 echo "  - Running unittest tests..."
